@@ -56,7 +56,6 @@ if has('mouse')		" In many terminal emulators the mouse works just fine, thus en
 	set mouse=a
 endif
 
-
 " ################
 " #### General####
 " ################
@@ -68,7 +67,7 @@ set wildmenu 	" show all commands on second complete
 
 set encoding=utf-8
 set fillchars+=vert:│
-set listchars=tab:»\ ,extends:›,precedes:‹,nbsp:·,trail:·
+set list listchars=tab:»\ ,extends:›,precedes:‹,nbsp:·,trail:·
 
 " ################
 " #### Themes ####
