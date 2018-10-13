@@ -1,0 +1,29 @@
+#!/bin/bash
+INSTALLDIR=${1:-$HOME}
+IMPORT_FILES=".bashrc"
+IMPORT_DIR=""
+
+if [ "$1" == "-h" ] || [ "$1" == "-?" ] || [ "$1" == "--help" ]; then
+	echo "$0 <dotfiles install dir>"
+	echo "Existing dotfiles will be moved to <filename>.old"
+	exit
+fi
+
+# Check for tmux
+if [ "$(dpkg -s tmux | grep "install ok installed")" != "" ];
+then
+	echo -e "tmux found... Importing tmux config"
+	IMPORT_FILES+=" .tmux.conf"
+	IMPORT_DIR+=" .tmux"
+else
+	echo "tmux not found."
+fi
+
+IMPORT_FILES+=" .vimrc"
+IMPORT_DIR+=" .vim"
+
+for i in $IMPORT_FILES $IMPORT_DIR
+do
+	mv $INSTALLDIR/$i $INSTALLDIR/$i.old 2> /dev/null
+	ln -s $PWD/$i $INSTALLDIR/$i;
+done;
