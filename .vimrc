@@ -16,7 +16,10 @@ Plugin 'VundleVim/Vundle.vim'
 " All the plugins go here :
 Plugin 'scrooloose/nerdtree' " We NEED this !!
 Plugin 'easymotion/vim-easymotion' " To naviguate easily in files
-Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-fugitive' " Git helper
+Plugin 'Valloric/YouCompleteMe' " Enhanced completion
+Plugin 'scrooloose/nerdcommenter' " No comments needed LMAO... :'(
+Plugin 'scrooloose/syntastic' " Check for syntax errors at runtime
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
