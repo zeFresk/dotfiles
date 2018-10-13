@@ -20,6 +20,7 @@ Plugin 'tpope/vim-fugitive' " Git helper
 Plugin 'Valloric/YouCompleteMe' " Enhanced completion
 Plugin 'scrooloose/nerdcommenter' " No comments needed LMAO... :'(
 Plugin 'scrooloose/syntastic' " Check for syntax errors at runtime
+Plugin 'Chiel92/vim-autoformat' " Add clang autoformat, very handy !
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -35,6 +36,8 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
+
+let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py' " Default ycm file from JDevlieghere
 
 
 
@@ -91,4 +94,4 @@ ino <left> <Nop>
 ino <right> <Nop>
 ino <up> <Nop>
 
-
+noremap <F3> :Autoformat<CR>
