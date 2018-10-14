@@ -21,6 +21,7 @@ Plugin 'Valloric/YouCompleteMe' " Enhanced completion
 Plugin 'scrooloose/nerdcommenter' " No comments needed LMAO... :'(
 Plugin 'scrooloose/syntastic' " Check for syntax errors at runtime
 Plugin 'Chiel92/vim-autoformat' " Add clang autoformat, very handy !
+Plugin 'airblade/vim-gitgutter' " For easy git diff
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -70,6 +71,8 @@ set number 	" show line number
 set showcmd 	" show incomplete commands
 set scrolloff=3	" don't let cursor touch the edge
 set wildmenu 	" show all commands on second complete
+set ttyfast 	" no slowing down when scrolling
+set incsearch
 
 set encoding=utf-8
 set fillchars+=vert:│
@@ -84,14 +87,50 @@ color molokai
 " #############
 " ## Mapping ##
 " #############
-no <down> <Nop>
+let mapleader=","
+
+" Unmap the arrow keys
+no <down> ddp
 no <left> <Nop>
 no <right> <Nop>
-no <up> <Nop>
-
+no <up> ddkP
 ino <down> <Nop>
 ino <left> <Nop>
 ino <right> <Nop>
 ino <up> <Nop>
+vno <down> <Nop>
+vno <left> <Nop>
+vno <right> <Nop>
+vno <up> <Nop>
 
+" tabs
+nmap <C-Tab> :tabnext<CR>
+nmap <C-S-Tab> :tabprevious<CR>
+map <C-S-Tab> :tabprevious<CR>
+map <C-Tab> :tabnext<CR>
+imap <C-S-Tab> <ESC>:tabprevious<CR>
+imap <C-Tab> <ESC>:tabnext<CR>
+noremap <F7> :set expandtab!<CR>
+nmap <Leader>h :tabnew<CR>
+
+" Autoformat
 noremap <F3> :Autoformat<CR>
+
+" I really hate that things don't auto-center
+nmap G Gzz
+nmap n nzz
+nmap N Nzz
+nmap } }zz
+nmap { {zz
+
+" Easymotion bindings
+map <Leader> <Plug>(easymotion-prefix)
+map  / <Plug>(easymotion-sn)
+omap / <Plug>(easymotion-tn)
+
+" Insert line without quitting normal mode
+nmap <Leader>l o<ESC>k
+nmap <Leader>L O<ESC>j
+
+" NERDTree
+nmap <leader>o <ESC>:NERDTreeToggle<CR><C-w>w
