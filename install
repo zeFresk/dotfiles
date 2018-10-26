@@ -87,5 +87,8 @@ if [ TMUX_FOUND ]; then
 	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 	echo -e "Installing tmux plugins, this may take a while."
 	~/.tmux/plugins/tpm/scripts/install_plugins.sh
+	if [ ! -e "~/.bashrc" ]; then
+		touch ~/.bashrc
+	fi
 	echo -e "source ~/.bashrc" >> .bash_profile
 fi
