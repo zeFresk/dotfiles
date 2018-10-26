@@ -17,7 +17,7 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'scrooloose/nerdtree' " We NEED this !!
 Plugin 'easymotion/vim-easymotion' " To naviguate easily in files
 Plugin 'tpope/vim-fugitive' " Git helper
-Plugin 'Valloric/YouCompleteMe' " Enhanced completion
+""Plugin 'Valloric/YouCompleteMe' " Enhanced completion
 Plugin 'scrooloose/nerdcommenter' " No comments needed LMAO... :'(
 Plugin 'scrooloose/syntastic' " Check for syntax errors at runtime
 Plugin 'Chiel92/vim-autoformat' " Add clang autoformat, very handy !
