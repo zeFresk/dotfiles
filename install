@@ -3,6 +3,20 @@ INSTALLDIR=${1:-$HOME}
 IMPORT_FILES=".bashrc"
 IMPORT_DIR=""
 
+#asking if user is on windows
+read -n 1 -p "Are you using WSL (y/n) ? " WSL
+case $WSL in
+	y|Y ) echo "export DISPLAY=127.0.0.1" >> .bashrc
+esac
+
+#asking for powerline
+read -n 1 -p "Install powerline (y/n) ? " PWL
+case $PWL in
+	y|Y ) PWL_INSTALL=true;;
+	* ) PWL_INSTALL=false;;
+esac
+
+
 if [ "$1" == "-h" ] || [ "$1" == "-?" ] || [ "$1" == "--help" ]; then
 	echo "$0 <dotfiles install dir>"
 	echo "Existing dotfiles will be moved to <filename>.old"
@@ -12,18 +26,66 @@ fi
 # Check for tmux
 if [ "$(dpkg -s tmux | grep "install ok installed")" != "" ];
 then
+	TMUX_FOUND=true
 	echo -e "tmux found... Importing tmux config"
 	IMPORT_FILES+=" .tmux.conf"
 	IMPORT_DIR+=" .tmux"
 else
+	TMUX_FOUND=false
 	echo "tmux not found."
 fi
 
-IMPORT_FILES+=" .vimrc"
+echo -e "Installing vundle."
+git clone https://github.com/VundleVim/Vundle.vim.git .vim/bundle/Vundle.vim
+
 IMPORT_DIR+=" .vim"
+IMPORT_FILES+=" .vimrc"
 
 for i in $IMPORT_FILES $IMPORT_DIR
 do
 	mv $INSTALLDIR/$i $INSTALLDIR/$i.old 2> /dev/null
 	ln -s $PWD/$i $INSTALLDIR/$i;
 done;
+
+echo -e "Installing vim plugins, this may take a while."
+vim +PluginInstall +qall
+
+#Searching for python in vim
+if [ $(vim --version | grep -oP "[+-](?=python3)") = "+" ]; then
+	USE_PIP=pip3
+	PYTHON_VERSION=$(python3 --version | grep -oP "\d+\.\d+\.\d+")
+elif [ $(vim --version | grep -oP "[+-](?=python )") = "+" ]; then
+	USE_PIP=pip
+	PYTHON_VERSION=$(python --version 2>&1 | grep -oP "\d+\.\d+\.\d+")
+fi
+
+if [ PWL_INSTALL ]; then
+	echo -e "Installing powerline."
+
+	$USE_PIP powerline-status
+
+	#setting up bashrc
+	echo -e "# Power-line" >> ~/.bashrc
+	echo -e "PATH=$PATH:$HOME/.local/bin" >> ~/.bashrc
+	echo -e "if [ -f ~/.local/lib/python""$PYTHON_VERSION""/site-packages/powerline/bindings/bash/powerline.sh ]; then" >> ~/.bashrc
+	echo -e "\tsource ~/.local/lib/python""$PYTHON_VERSION""/site-packages/powerline/bindings/bash/powerline.sh" >> ~/.bashrc
+	echo -e "fi" >> ~/.bashrc
+
+	#downloading fonts
+	echo -e "Downloading fonts for powerline."
+	git clone https://github.com/powerline/fonts.git --depth=1
+	cd fonts
+	chmod +x install.sh
+	./install.sh
+	cd ..
+	rm -rf fonts
+	echo -e "Fonts installed, don't forget to select one."
+fi
+
+if [ TMUX_FOUND ]; then
+	echo -e "Installing tpm."
+	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+	echo -e "Installing tmux plugins, this may take a while."
+	~/.tmux/plugins/tpm/scripts/install_plugins.sh
+	echo -e "source ~/.bashrc" >> .bash_profile
+fi
