@@ -24,8 +24,7 @@ if [ "$1" == "-h" ] || [ "$1" == "-?" ] || [ "$1" == "--help" ]; then
 fi
 
 # Check for tmux
-if [ "$(dpkg -s tmux | grep "install ok installed")" != "" ];
-then
+if [ "$(dpkg -s tmux | grep "install ok installed")" != "" ]; then
 	TMUX_FOUND=true
 	echo -e "tmux found... Importing tmux config"
 	IMPORT_FILES+=" .tmux.conf"
@@ -35,8 +34,19 @@ else
 	echo "tmux not found."
 fi
 
+# Check if python3 is installed
+if [ "$(dpkg -s python3 | grep "install ok installed")" != "" ]; then
+	PYTHON3_FOUND=true
+fi
+
 echo -e "Installing vundle."
 git clone https://github.com/VundleVim/Vundle.vim.git .vim/bundle/Vundle.vim
+
+if [ -z ${PYTHON3_FOUND+x} ]; then #python 3 isn't present on the system
+	INSTALL_YCM=true
+	echo -e "Python 3 isn't installed on your system, YCM will not be installed."
+	sed -i "s/Plugin 'Valloric/YouCompleteMe'/\" Plugin 'Valloric/YouCompleteMe'" .vimrc #Disable YouCompleteMe
+fi
 
 IMPORT_DIR+=" .vim"
 IMPORT_FILES+=" .vimrc"
@@ -49,6 +59,11 @@ done;
 
 echo -e "Installing vim plugins, this may take a while."
 vim +PluginInstall +qall
+
+if [ $INSTALL_YCM ]; then
+	echo -e "Compiling YCM."
+	python3 ~/.vim/bundle/YouCompleteMe/install.py --all
+fi
 
 #Searching for python in vim
 if [ $(vim --version | grep -oP "[+-](?=python3)") = "+" ]; then
