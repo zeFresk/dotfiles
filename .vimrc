@@ -17,7 +17,8 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'scrooloose/nerdtree' " We NEED this !!
 Plugin 'easymotion/vim-easymotion' " To naviguate easily in files
 Plugin 'tpope/vim-fugitive' " Git helper
-Plugin 'Valloric/YouCompleteMe' " Enhanced completion
+Plugin 'davits/YouCompleteMe' " Enhanced completion
+Plugin 'davits/DyeVim' " C++ syntax highlighting using YCM
 Plugin 'scrooloose/nerdcommenter' " No comments needed LMAO... :'(
 Plugin 'scrooloose/syntastic' " Check for syntax errors at runtime
 Plugin 'Chiel92/vim-autoformat' " Add clang autoformat, very handy !
@@ -41,7 +42,7 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 
 let g:ycm_global_ycm_extra_conf = '~/.vim/.ycm_extra_conf.py' " Default ycm file from JDevlieghere
-
+let g:dyevim_timeout=50
 
 " ################
 " ## syntastic  ##

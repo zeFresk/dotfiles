@@ -16,6 +16,13 @@ case $PWL in
 	* ) PWL_INSTALL=false;;
 esac
 
+#asking for YCM
+read -n 1 -p "Install YouCompleteMe (y/n) ? " PWL
+case $PWL in
+	y|Y ) YCM_INSTALL=true;;
+	* ) YCM_INSTALL=false;;
+esac
+
 
 if [ "$1" == "-h" ] || [ "$1" == "-?" ] || [ "$1" == "--help" ]; then
 	echo "$0 <dotfiles install dir>"
@@ -42,10 +49,15 @@ fi
 echo -e "Installing vundle."
 git clone https://github.com/VundleVim/Vundle.vim.git .vim/bundle/Vundle.vim
 
-if [ -z ${PYTHON3_FOUND+x} ]; then #python 3 isn't present on the system
-	INSTALL_YCM=true
-	echo -e "Python 3 isn't installed on your system, YCM will not be installed."
-	sed -i "s/Plugin 'Valloric/YouCompleteMe'/\" Plugin 'Valloric/YouCompleteMe'" .vimrc #Disable YouCompleteMe
+if [ -z ${PYTHON3_FOUND+x} ] || [ ! $YCM_INSTALL ]; then #python 3 isn't present on the system or the user doesn't want to install ycm
+
+	if [ $YCM_INSTALL ]; then
+		echo -e "Python 3 isn't installed on your system, YCM will not be installed."
+	fi
+
+	sed -i "s/Plugin 'davits/YouCompleteMe'/\" Plugin 'davits/YouCompleteMe'" .vimrc #Disable YouCompleteMe
+	sed -i "s/Plugin 'davits/DyeVim'/\" Plugin 'bfrg/vim-cpp-modern'" .vimrc #Change syntax highlighting
+	YCM_INSTALL=false
 fi
 
 IMPORT_DIR+=" .vim"
@@ -60,7 +72,7 @@ done;
 echo -e "Installing vim plugins, this may take a while."
 vim +PluginInstall +qall
 
-if [ $INSTALL_YCM ]; then
+if [ $YCM_INSTALL ]; then
 	echo -e "Compiling YCM."
 	python3 ~/.vim/bundle/YouCompleteMe/install.py --all
 fi
