@@ -1,1 +1,1 @@
-/home/zefresk/.zshrc
+../../.zshrc
