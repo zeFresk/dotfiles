@@ -4,8 +4,8 @@ zeFresk's dotfiles
 My portable [neovim](https://neovim.io/) + [zsh](https://www.zsh.org/) + [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh) setup.
 Should work **without root access**.
 
-#Plugins
-###neovim
+# Plugins
+### neovim
 - [coc](https://github.com/neoclide/coc.nvim) + [coc-neoinclude](https://github.com/jsfaint/coc-neoinclude) : for auto-completion.
 - [markdown-preview](https://github.com/iamcco/markdown-preview.nvim) : for... markdown preview ?
 - [nerdtree](https://github.com/crooloose/nerdtree) : because you always need it.
@@ -16,7 +16,7 @@ Should work **without root access**.
 - [ALE](https://github.com/dense-analysis/ale) : syntastic but better, check for syntax errors.
 - [airline](https://github.com/vim-airline/vim-airline) : for a better UI.
 
-###zsh + oh-my-zsh
+### zsh + oh-my-zsh
 - [git](https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git) : aliases for git and usefull stuff.
 - [autosuggest](https://github.com/zsh-users/zsh-autosuggestions) : autosuggestions in terminal.
 - [LS\_COLORS](https://github.com/trapd00r/LS_COLORS) : better colors for ls.
