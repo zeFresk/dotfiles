@@ -1,24 +1,29 @@
 zeFresk's dotfiles
 
-### Introduction
-Here you will find my configuration for vim and tmux along with my .bashrc
-Almost everything comes from others and I only made my own mix.
-Compatible with WSL.
+# Introduction
+My portable [neovim](https://neovim.io/) + [zsh](https://www.zsh.org/) + [Oh-My-Zsh](https://github.com/robbyrussell/oh-my-zsh) setup.
+Should work **without root access**.
 
-### Installation
-Just git clone the repository and run install.
+#Plugins
+###neovim
+- [coc](https://github.com/neoclide/coc.nvim) + [coc-neoinclude](https://github.com/jsfaint/coc-neoinclude) : for auto-completion.
+- [markdown-preview](https://github.com/iamcco/markdown-preview.nvim) : for... markdown preview ?
+- [nerdtree](https://github.com/crooloose/nerdtree) : because you always need it.
+- [easymotion](https://github.com/easymotion/vim-easymotion) : to move quicker inside your code.
+- [neotex](https://github.com/donRaphaco/neotex) : provide latex preview and completion.
+- [gitgutter](https://github.com/airblade/vim-gitgutter) : to visualize change between commits.
+- [autoformat](https://github.com/Chiel92/vim-autoformat) : clang-format to quickly clean-up code.
+- [ALE](https://github.com/dense-analysis/ale) : syntastic but better, check for syntax errors.
+- [airline](https://github.com/vim-airline/vim-airline) : for a better UI.
 
-```
-git clone https://github.com/zeFresk/dotfiles.git
-cd dotfiles
-chmod +x install
-./install
-```
+###zsh + oh-my-zsh
+- [git](https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/git) : aliases for git and usefull stuff.
+- [autosuggest](https://github.com/zsh-users/zsh-autosuggestions) : autosuggestions in terminal.
+- [LS\_COLORS](https://github.com/trapd00r/LS_COLORS) : better colors for ls.
+- [alien](https://github.com/eendroroy/alien) theme : my favorite omz theme.
 
-You will have to change the default terminal font manually if you choose to install powerline.
-
-### Credits
-Heavily inspired by :
-* [shawncplus](https://github.com/shawncplus)
-* [sam007961](https://github.com/sam007961)
-* [spicycode](https://gist.github.com/spicycode)
+# Installation
+Just clone and run install
+`git clone https://github.com/zeFresk/dotfiles.git
+cd dotfiles && chmod +x install
+./install`

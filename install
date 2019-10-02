@@ -1,28 +1,17 @@
 #!/bin/bash
+
 INSTALLDIR=${1:-$HOME}
 IMPORT_FILES=".bashrc"
 IMPORT_DIR=""
 
-#asking if user is on windows
-read -n 1 -p "Are you using WSL (y/n) ? " WSL
-case $WSL in
-	y|Y ) echo "export DISPLAY=127.0.0.1" >> .bashrc
-esac
-
-#asking for powerline
-read -n 1 -p "Install powerline (y/n) ? " PWL
-case $PWL in
-	y|Y ) PWL_INSTALL=true;;
-	* ) PWL_INSTALL=false;;
-esac
-
-#asking for YCM
-read -n 1 -p "Install YouCompleteMe (y/n) ? " PWL
-case $PWL in
-	y|Y ) YCM_INSTALL=true;;
-	* ) YCM_INSTALL=false;;
-esac
-
+# Get script directory
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
 if [ "$1" == "-h" ] || [ "$1" == "-?" ] || [ "$1" == "--help" ]; then
 	echo "$0 <dotfiles install dir>"
@@ -30,92 +19,103 @@ if [ "$1" == "-h" ] || [ "$1" == "-?" ] || [ "$1" == "--help" ]; then
 	exit
 fi
 
-# Check for tmux
-if [ "$(dpkg -s tmux | grep "install ok installed")" != "" ]; then
-	TMUX_FOUND=true
-	echo -e "tmux found... Importing tmux config"
-	IMPORT_FILES+=" .tmux.conf"
-	IMPORT_DIR+=" .tmux"
+read -p "Do you have root access ? [y/n] " -i y -e ROOT_ACCESS
+
+printf "Checking for zsh..."
+if [ "$(dpkg -s zsh | grep "install ok installed")" != "" ]; then
+	printf " found!\n"
 else
-	TMUX_FOUND=false
-	echo "tmux not found."
-fi
-
-# Check if python3 is installed
-if [ "$(dpkg -s python3 | grep "install ok installed")" != "" ]; then
-	PYTHON3_FOUND=true
-fi
-
-echo -e "Installing vundle."
-git clone https://github.com/VundleVim/Vundle.vim.git .vim/bundle/Vundle.vim
-
-if [ -z ${PYTHON3_FOUND+x} ] || [ ! $YCM_INSTALL ]; then #python 3 isn't present on the system or the user doesn't want to install ycm
-
-	if [ $YCM_INSTALL ]; then
-		echo -e "Python 3 isn't installed on your system, YCM will not be installed."
+	printf " not found!\n"
+	printf "Installing zsh...\n"
+	if [ "$ROOT_ACCESS" == "y" ]; then
+		sudo apt install zsh
+	else
+		cd /tmp
+		wget -O zsh.tar.xz https://sourceforge.net/projects/zsh/files/latest/download 
+		mkdir zsh	
+		tar -xvf zsh.tar -C zsh --strip-components 1 
+		cd zsh
+		./configure --prefix=$HOME
+		make
+		make install
+		cd "$DIR"
 	fi
-
-	sed -i "s/Plugin 'davits/YouCompleteMe'/\" Plugin 'davits/YouCompleteMe'" .vimrc #Disable YouCompleteMe
-	sed -i "s/Plugin 'davits/DyeVim'/\" Plugin 'bfrg/vim-cpp-modern'" .vimrc #Change syntax highlighting
-	YCM_INSTALL=false
+	printf "zsh installed!\n"
 fi
 
-IMPORT_DIR+=" .vim"
-IMPORT_FILES+=" .vimrc"
-
-for i in $IMPORT_FILES $IMPORT_DIR
-do
-	mv $INSTALLDIR/$i $INSTALLDIR/$i.old 2> /dev/null
-	ln -s $PWD/$i $INSTALLDIR/$i;
-done;
-
-echo -e "Installing vim plugins, this may take a while."
-vim +PluginInstall +qall
-
-if [ $YCM_INSTALL ]; then
-	echo -e "Compiling YCM."
-	python3 ~/.vim/bundle/YouCompleteMe/install.py --all
+printf "Checking for zplugin..."
+if [ -d "~/.zplugin" ]; then
+	printf " found!\n"
+else
+	printf " not found!\n"
+	printf "Installing zplugin...\n"
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
+	printf "zplugin installed!\n"
 fi
 
-#Searching for python in vim
-if [ $(vim --version | grep -oP "[+-](?=python3)") = "+" ]; then
-	USE_PIP=pip3
-	PYTHON_VERSION=$(python3 --version | grep -oP "\d+\.\d+\.\d+")
-elif [ $(vim --version | grep -oP "[+-](?=python )") = "+" ]; then
-	USE_PIP=pip
-	PYTHON_VERSION=$(python --version 2>&1 | grep -oP "\d+\.\d+\.\d+")
-fi
-
-if [ PWL_INSTALL ]; then
-	echo -e "Installing powerline."
-
-	$USE_PIP powerline-status
-
-	#setting up bashrc
-	echo -e "# Power-line" >> ~/.bashrc
-	echo -e "PATH=$PATH:$HOME/.local/bin" >> ~/.bashrc
-	echo -e "if [ -f ~/.local/lib/python""$PYTHON_VERSION""/site-packages/powerline/bindings/bash/powerline.sh ]; then" >> ~/.bashrc
-	echo -e "\tsource ~/.local/lib/python""$PYTHON_VERSION""/site-packages/powerline/bindings/bash/powerline.sh" >> ~/.bashrc
-	echo -e "fi" >> ~/.bashrc
-
-	#downloading fonts
-	echo -e "Downloading fonts for powerline."
-	git clone https://github.com/powerline/fonts.git --depth=1
-	cd fonts
-	chmod +x install.sh
-	./install.sh
-	cd ..
-	rm -rf fonts
-	echo -e "Fonts installed, don't forget to select one."
-fi
-
-if [ TMUX_FOUND ]; then
-	echo -e "Installing tpm."
-	git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-	echo -e "Installing tmux plugins, this may take a while."
-	~/.tmux/plugins/tpm/scripts/install_plugins.sh
-	if [ ! -e "~/.bashrc" ]; then
-		touch ~/.bashrc
+printf "Checking for neovim..."
+if [ "$(dpkg -s nvim | grep "install ok installed")" != "" ]; then
+	printf " found!\n"
+else
+	printf " not found!\n"
+	printf "Installing neovim...\n"
+	if [ "$ROOT_ACCESS" == "y" ]; then
+		sudo apt install neovim python-neovim python3-neovim
+	else
+		printf "Downloading neovim...\n"
+		curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage 
+		chmod u+x nvim.appimage
+		mkdir --parents ~/.local/bin
+		mv nvim.appimage ~/.local/bin
+		printf "\n#nvim support\nalias nvim='nvim.appimage'" >> .zshrc
 	fi
-	echo -e "source ~/.bashrc" >> .bash_profile
+	printf "neovim installed!\n"
 fi
+
+printf "Checking for vim-plug..."
+if [ -f "~/.local/share/nvim/site/autoload/plug.vim" ]; then
+	printf " found!\n"
+else
+	printf " not found!\n"
+	printf "Installing vim-plug...\n"
+	curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	printf "vim-plug installed!\n"
+fi
+
+printf "Installing powerline fonts..."
+if [ "$ROOT_ACCESS" == "y" ]; then
+	sudo apt install fonts-powerline
+else
+	git clone https://github.com/powerline/fonts.git --depth=1 /tmp/fonts
+	chmod +x /tmp/fonts/install.sh
+	exec /tmp/fonts/install.sh
+fi
+printf "powerline fonts installed!\n"
+
+printf "Copying neovim and zsh configs..."
+cp .zshrc ~/.zshrc
+mkdir --parents ~/.config/nvim
+cp init.vim ~/.config/nvim/init.vim
+cp coc-settings.json ~/.config/nvim/coc-settings.json
+printf " done!\n"
+
+printf "Setting default shell to zsh..."
+if [ "$ROOT_ACCESS" == "y" ]; then
+	chsh -s /bin/zsh
+else
+	if [ -f "~/.profile" ]; then
+		echo "exec $HOME/bin/zsh -l" >> ~/.profile
+	else
+		echo "exec $HOME/bin/zsh -l" >> ~/.login
+	fi
+fi
+printf " done!\n"
+
+printf "Installing neovim plugins..."
+nvim -c "PlugInstall"
+printf " done!\n"
+
+printf "Installing Coc extensions..."
+nvim -c "CocInstall coc-marketplace coc-json coc-tsserver coc-html coc-css coc-java coc-yaml coc-python coc-highlight coc-xml"
+
+printf "\n###\nInstallation finished, please launch a new terminal or run zsh.\n"

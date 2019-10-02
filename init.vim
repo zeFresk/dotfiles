@@ -1,0 +1,1 @@
+/home/zefresk/.config/nvim/init.vim
