@@ -116,6 +116,6 @@ nvim -c "PlugInstall"
 printf " done!\n"
 
 printf "Installing Coc extensions..."
-nvim -c "CocInstall coc-marketplace coc-json coc-tsserver coc-html coc-css coc-java coc-yaml coc-python coc-highlight coc-xml"
+nvim -c "CocInstall coc-marketplace coc-json coc-tsserver coc-html coc-css coc-java coc-yaml coc-python coc-highlight coc-xml coc-sql coc-texlab coc-sh coc-phpls coc-java coc-ccls"
 
 printf "\n###\nInstallation finished, please launch a new terminal or run zsh.\n"

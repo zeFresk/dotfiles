@@ -11,7 +11,7 @@ Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install()}}
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' , 'for': 'markdown' }
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'easymotion/vim-easymotion'
-Plug 'donRaphaco/neotex', { 'for': 'tex' }
+" Plug 'donRaphaco/neotex', { 'for': 'tex' } " removed for coc plugin
 
 Plug 'airblade/vim-gitgutter'
 Plug 'Chiel92/vim-autoformat'
