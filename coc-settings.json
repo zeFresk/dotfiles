@@ -1,1 +1,5 @@
-../../.config/nvim/coc-settings.json
+{
+	"suggest.noselect": false,
+	"suggest.triggerAfterInsertEnter": true,
+	"suggest.minTriggerInputLength": 1
+}
