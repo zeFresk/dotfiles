@@ -81,6 +81,9 @@ set encoding=utf-8
 set fillchars+=vert:│
 set list listchars=tab:»\ ,extends:›,precedes:‹,nbsp:·,trail:·
 
+""" Homemade functions
+command! -nargs=0 Vt :vertical rightbelow split +te
+
 """ Mapping
 let mapleader=","
 
