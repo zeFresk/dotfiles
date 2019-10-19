@@ -24,6 +24,8 @@ Should work **without root access**.
 
 # Installation
 Just clone and run install
-`git clone https://github.com/zeFresk/dotfiles.git
+``` bash
+git clone https://github.com/zeFresk/dotfiles.git
 cd dotfiles && chmod +x install
-./install`
+./install
+```

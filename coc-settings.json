@@ -1,5 +1,8 @@
 {
-	"suggest.noselect": false,
+	"suggest.autoTrigger": "always",
+	"suggest.noselect": true,
 	"suggest.triggerAfterInsertEnter": true,
-	"suggest.minTriggerInputLength": 1
+	"suggest.minTriggerInputLength": 1,
+	"suggest.timeout": 5000,
+	"suggest.enablePreselect": true
 }

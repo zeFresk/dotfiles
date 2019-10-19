@@ -60,7 +60,8 @@ else
 	printf " not found!\n"
 	printf "Installing neovim...\n"
 	if [ "$ROOT_ACCESS" == "y" ]; then
-		sudo apt install neovim python-neovim python3-neovim
+		sudo apt install neovim python-neovim python3-neovim python-pip python3-pip
+		sudo pip install pynvim && sudo pip3 install pynvim
 	else
 		printf "Downloading neovim...\n"
 		curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage 
@@ -68,9 +69,61 @@ else
 		mkdir --parents ~/.local/bin
 		mv nvim.appimage ~/.local/bin
 		printf "\n#nvim support\nalias nvim='nvim.appimage'" >> .zshrc
+		printf "Checking for pip... "
+		if [ "$(dpkg -s pip | grep "install ok installed")" != "" ]; then
+			printf "Installing Python2 support...\n"
+			pip install --user pynvim
+		else
+			printf "!Warning : No pip detected neovim may not works correctly !\n"
+		fi
+		printf "Checking for pip3... "
+		if [ "$(dpkg -s pythonpip | grep "install ok installed")" != "" ]; then
+			printf "Installing Python3 support...\n"
+			pip3 install --user pynvim
+		else
+			printf "!Warning : No pip3 detected neovim may not works correctly !\n"
+		fi
 	fi
 	printf "neovim installed!\n"
 fi
+
+read -p "Neovim works better with ruby extension, install it ? [y/n] " -i y -e RUBY
+if [ "$RUBY" == "y" ]; then 
+	if ! command -v gem >/dev/null 2>&1 ; then
+		if [ "$ROOT_ACCESS" == "y" ]; then
+			sudo apt install ruby-full
+			sudo gem install neovim
+		else
+			printf "Error: Cannot install ruby without root privileges !\n"
+		fi
+	else
+		if [ "$ROOT_ACCESS" == "y" ]; then
+			sudo gem install neovim
+		else
+			gem install --user-install neovim
+		fi
+	fi
+fi
+
+read -p "Node.js is recommended, install it ? [y/n] " -i y -e NODEJS
+if [ "$NODEJS" == "y" ]; then 
+	if ! command -v npm >/dev/null 2>&1 ; then
+		if [ "$ROOT_ACCESS" == "y" ]; then
+			wget -qO- https://deb.nodesource.com/setup_12.x | sudo -E bash && sudo apt install -y nodejs
+			sudo npm install -g neovim
+		else
+			printf "Error: Cannot install Node.js without root privileges !\n"
+		fi
+	else
+		if [ "$ROOT_ACCESS" == "y" ]; then
+			sudo npm install -g neovim
+		else
+			printf "Error: Cannot install neovim package without root privileges.\n"
+		fi
+	fi
+fi
+
+
 
 printf "Checking for vim-plug..."
 if [ -f "~/.local/share/nvim/site/autoload/plug.vim" ]; then

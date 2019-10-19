@@ -43,7 +43,7 @@ inoremap <silent><expr> <Tab>
       \ <SID>check_back_space() ? "\<Tab>" :
       \ coc#refresh()
 
-inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+" inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
 
@@ -56,6 +56,9 @@ nmap <silent> gr <Plug>(coc-references)
 
 " Use `:Format` to format current buffer
 command! -nargs=0 Format :call CocAction('format')
+
+" Add status line support, for integration with other plugin, checkout `:h coc-status` 
+set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 """ Theme
 set termguicolors
@@ -83,6 +86,7 @@ set list listchars=tab:»\ ,extends:›,precedes:‹,nbsp:·,trail:·
 
 """ Homemade functions
 command! -nargs=0 Vt :vertical rightbelow split +te
+command! -nargs=0 Ht :split +te
 
 """ Mapping
 let mapleader=","
