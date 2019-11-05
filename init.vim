@@ -14,8 +14,8 @@ Plug 'easymotion/vim-easymotion'
 " Plug 'donRaphaco/neotex', { 'for': 'tex' } " removed for coc plugin
 
 Plug 'airblade/vim-gitgutter'
-Plug 'Chiel92/vim-autoformat'
-" Plug 'dense-analysis/ale'
+" Plug 'Chiel92/vim-autoformat' " replaced by coc-format
+" Plug 'dense-analysis/ale' " replaced by coc
 
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
@@ -59,7 +59,9 @@ function! s:show_documentation()
 endfunction
 
 " Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
+au CursorHold * silent call CocActionAsync('highlight')
+" Show function signature
+au CursorHoldI * sil call CocActionAsync('showSignatureHelp')
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
@@ -90,7 +92,41 @@ xmap <silent> <C-d> <Plug>(coc-range-select)
 command! -nargs=0 Format :call CocAction('format')
 
 " Add status line support, for integration with other plugin, checkout `:h coc-status` 
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')} " should work fine with airline out of the box.
+
+" CCLS + coc
+" bases
+nn <silent> xb :call CocLocations('ccls','$ccls/inheritance')<cr>
+" bases of up to 3 levels
+nn <silent> xb :call CocLocations('ccls','$ccls/inheritance',{'levels':3})<cr>
+" derived
+nn <silent> xd :call CocLocations('ccls','$ccls/inheritance',{'derived':v:true})<cr>
+" derived of up to 3 levels
+nn <silent> xD :call CocLocations('ccls','$ccls/inheritance',{'derived':v:true,'levels':3})<cr>
+
+" caller
+nn <silent> xc :call CocLocations('ccls','$ccls/call')<cr>
+" callee
+nn <silent> xC :call CocLocations('ccls','$ccls/call',{'callee':v:true})<cr>
+
+" $ccls/member
+" member variables / variables in a namespace
+nn <silent> xm :call CocLocations('ccls','$ccls/member')<cr>
+" member functions / functions in a namespace
+nn <silent> xf :call CocLocations('ccls','$ccls/member',{'kind':3})<cr>
+" nested classes / types in a namespace
+nn <silent> xs :call CocLocations('ccls','$ccls/member',{'kind':2})<cr>
+
+nmap <silent> xt <Plug>(coc-type-definition)<cr>
+nn <silent> xv :call CocLocations('ccls','$ccls/vars')<cr>
+nn <silent> xV :call CocLocations('ccls','$ccls/vars',{'kind':1})<cr>
+
+nn xx x
+
+nn <silent><buffer> <C-l> :call CocLocations('ccls','$ccls/navigate',{'direction':'D'})<cr>
+nn <silent><buffer> <C-k> :call CocLocations('ccls','$ccls/navigate',{'direction':'L'})<cr>
+nn <silent><buffer> <C-j> :call CocLocations('ccls','$ccls/navigate',{'direction':'R'})<cr>
+nn <silent><buffer> <C-h> :call CocLocations('ccls','$ccls/navigate',{'direction':'U'})<cr>
 
 """ Theme
 set termguicolors
@@ -163,7 +199,7 @@ imap <C-S-Tab> <ESC>:bprevious<CR>
 imap <C-Tab> <ESC>:bnext<CR>
 
 """ Other shortcuts
-noremap <F3> :Autoformat<CR>
+noremap <F3> :Format<CR>
 
 " I really hate that things don't auto-center
 nmap G Gzz

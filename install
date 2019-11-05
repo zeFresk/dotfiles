@@ -169,6 +169,24 @@ nvim -c "PlugInstall"
 printf " done!\n"
 
 printf "Installing Coc extensions..."
-nvim -c "CocInstall coc-marketplace coc-json coc-tsserver coc-html coc-css coc-java coc-yaml coc-python coc-highlight coc-xml coc-sql coc-texlab coc-sh coc-phpls coc-java coc-ccls"
+nvim -c "CocInstall coc-marketplace coc-json coc-tsserver coc-html coc-css coc-java coc-yaml coc-python coc-highlight coc-xml coc-sql coc-texlab coc-sh coc-phpls coc-java"
+
+if [ "$ROOT_ACCESS" == "y" ]; then
+	if ! command -v ccls >/dev/null 2>&1 ; then
+		read -p "ccls not found, install it ? [y/n] " -i y -e CCLS
+		if [ "$CCLS" == "y" ]; then 
+			printf "Installing dependancies...\n"
+			sudo apt install cmake clang libclang-dev zlib1g-dev libncurses-dev rapidjson-dev libncurses5
+			printf "Retrieving latest clang installed...\n"
+			CLANG_VER=$(clang -v 2>&1 | grep -Po "clang version \K(\d)")
+			cmake -H. -BRelease -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-$CLANG_VER -DLLVM_INCLUDE_DIR=/usr/lib/llvm-$CLANG_VER/include -DLLVM_BUILD_INCLUDE_DIR=/usr/include/llvm-$CLANG_VER/
+			cmake --build Release
+			sudo cmake --build --target install
+		fi
+	fi
+fi
+
+
+
 
 printf "\n###\nInstallation finished, please launch a new terminal or run zsh.\n"
