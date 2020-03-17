@@ -4,9 +4,11 @@
 " Plugins START
 call plug#begin(stdpath('data').'/plugged')
 
-Plug 'Shougo/neoinclude.vim'
+"Plug 'Shougo/neoinclude.vim'
 Plug 'jsfaint/coc-neoinclude'
 Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install()}}
+
+Plug 'vim-vdebug/vdebug'
 
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' , 'for': 'markdown' }
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
@@ -159,6 +161,9 @@ command! -nargs=0 Vs :vertical split
 
 """ Mapping
 let mapleader=","
+
+" Allow saving of files as sudo when I forgot to start vim using sudo.
+cmap w!! w !sudo tee > /dev/null %
 
 " Unmap the arrow keys
 no <down> ddp

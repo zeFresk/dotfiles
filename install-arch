@@ -1,0 +1,185 @@
+#!/bin/bash
+
+INSTALLDIR=${1:-$HOME}
+IMPORT_FILES=".bashrc"
+IMPORT_DIR=""
+
+# Get script directory
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
+
+if [ "$1" == "-h" ] || [ "$1" == "-?" ] || [ "$1" == "--help" ]; then
+	echo "$0 <dotfiles install dir>"
+	echo "Existing dotfiles will be moved to <filename>.old"
+	exit
+fi
+
+read -p "Do you have root access ? [y/n] " -i y -e ROOT_ACCESS
+
+printf "Checking for zsh..."
+if [ "$(dpkg -s zsh | grep "install ok installed")" != "" ]; then
+	printf " found!\n"
+else
+	printf " not found!\n"
+	printf "Installing zsh...\n"
+	if [ "$ROOT_ACCESS" == "y" ]; then
+		sudo pacman -S zsh zsh-completions
+	else
+		cd /tmp
+		wget -O zsh.tar.xz https://sourceforge.net/projects/zsh/files/latest/download 
+		mkdir zsh	
+		tar -xvf zsh.tar -C zsh --strip-components 1 
+		cd zsh
+		./configure --prefix=$HOME
+		make
+		make install
+		cd "$DIR"
+	fi
+	printf "zsh installed!\n"
+fi
+
+printf "Checking for zplugin..."
+if [ -d "~/.zplugin" ]; then
+	printf " found!\n"
+else
+	printf " not found!\n"
+	printf "Installing zplugin...\n"
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
+	printf "zplugin installed!\n"
+fi
+
+printf "Checking for neovim..."
+if [ "$(dpkg -s nvim | grep "install ok installed")" != "" ]; then
+	printf " found!\n"
+else
+	printf " not found!\n"
+	printf "Installing neovim...\n"
+	if [ "$ROOT_ACCESS" == "y" ]; then
+		sudo pacman -S neovim python-neovim python-pip
+		sudo pip install pynvim && sudo pip2 install pynvim
+	else
+		printf "Downloading neovim...\n"
+		curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage 
+		chmod u+x nvim.appimage
+		mkdir --parents ~/.local/bin
+		mv nvim.appimage ~/.local/bin
+		printf "\n#nvim support\nalias nvim='nvim.appimage'" >> .zshrc
+		printf "Checking for pip... "
+		if [ "$(dpkg -s pip2 | grep "install ok installed")" != "" ]; then
+			printf "Installing Python2 support...\n"
+			pip2 install --user pynvim
+		else
+			printf "!Warning : No pip detected neovim may not works correctly !\n"
+		fi
+		printf "Checking for pip3... "
+		if [ "$(dpkg -s pip | grep "install ok installed")" != "" ]; then
+			printf "Installing Python3 support...\n"
+			pip install --user pynvim
+		else
+			printf "!Warning : No pip3 detected neovim may not works correctly !\n"
+		fi
+	fi
+	printf "neovim installed!\n"
+fi
+
+read -p "Neovim works better with ruby extension, install it ? [y/n] " -i y -e RUBY
+if [ "$RUBY" == "y" ]; then 
+	if ! command -v gem >/dev/null 2>&1 ; then
+		if [ "$ROOT_ACCESS" == "y" ]; then
+			sudo pacman -S ruby
+			sudo gem install neovim
+		else
+			printf "Error: Cannot install ruby without root privileges !\n"
+		fi
+	else
+		if [ "$ROOT_ACCESS" == "y" ]; then
+			sudo gem install neovim
+		else
+			gem install --user-install neovim
+		fi
+	fi
+fi
+
+read -p "Node.js is recommended, install it ? [y/n] " -i y -e NODEJS
+if [ "$NODEJS" == "y" ]; then 
+	if ! command -v npm >/dev/null 2>&1 ; then
+		if [ "$ROOT_ACCESS" == "y" ]; then
+			sudo pacman -S nodejs
+			sudo npm install -g neovim
+		else
+			printf "Error: Cannot install Node.js without root privileges !\n"
+		fi
+	else
+		if [ "$ROOT_ACCESS" == "y" ]; then
+			sudo npm install -g neovim
+		else
+			printf "Error: Cannot install neovim package without root privileges.\n"
+		fi
+	fi
+fi
+
+
+
+printf "Checking for vim-plug..."
+if [ -f "~/.local/share/nvim/site/autoload/plug.vim" ]; then
+	printf " found!\n"
+else
+	printf " not found!\n"
+	printf "Installing vim-plug...\n"
+	curl -fLo ~/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	printf "vim-plug installed!\n"
+fi
+
+printf "Installing powerline fonts..."
+if [ "$ROOT_ACCESS" == "y" ]; then
+	sudo pacman -S powerline-fonts
+else
+	git clone https://github.com/powerline/fonts.git --depth=1 /tmp/fonts
+	chmod +x /tmp/fonts/install.sh
+	exec /tmp/fonts/install.sh
+fi
+printf "powerline fonts installed!\n"
+
+printf "Copying neovim and zsh configs..."
+cp .zshrc ~/.zshrc
+ln -s $DIR/nvim ~/.config/nvim
+printf " done!\n"
+
+printf "Setting default shell to zsh..."
+if [ "$ROOT_ACCESS" == "y" ]; then
+	chsh -s /bin/zsh
+else
+	if [ -f "~/.profile" ]; then
+		echo "exec $HOME/bin/zsh -l" >> ~/.profile
+	else
+		echo "exec $HOME/bin/zsh -l" >> ~/.login
+	fi
+fi
+printf " done!\n"
+
+printf "Installing neovim plugins..."
+nvim -c "PlugInstall"
+printf " done!\n"
+
+printf "Installing Coc extensions..."
+nvim -c "CocInstall coc-marketplace coc-json coc-tsserver coc-html coc-css coc-java coc-yaml coc-python coc-highlight coc-xml coc-sql coc-texlab coc-sh coc-phpls coc-java"
+
+if [ "$ROOT_ACCESS" == "y" ]; then
+	if ! command -v ccls >/dev/null 2>&1 ; then
+		read -p "ccls not found, install it ? [y/n] " -i y -e CCLS
+		if [ "$CCLS" == "y" ]; then 
+			printf "Installing dependancies...\n"
+			sudo pacman -S ccls clang-format
+		fi
+	fi
+fi
+
+
+
+
+printf "\n###\nInstallation finished, please launch a new terminal or run zsh.\n"

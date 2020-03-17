@@ -10,10 +10,10 @@ Should work **without root access**.
 - [markdown-preview](https://github.com/iamcco/markdown-preview.nvim) : for... markdown preview ?
 - [nerdtree](https://github.com/crooloose/nerdtree) : because you always need it.
 - [easymotion](https://github.com/easymotion/vim-easymotion) : to move quicker inside your code.
-- [neotex](https://github.com/donRaphaco/neotex) : provide latex preview and completion.
+~~- [neotex](https://github.com/donRaphaco/neotex) : provide latex preview and completion.~~
 - [gitgutter](https://github.com/airblade/vim-gitgutter) : to visualize change between commits.
-- [autoformat](https://github.com/Chiel92/vim-autoformat) : clang-format to quickly clean-up code.
-- [ALE](https://github.com/dense-analysis/ale) : syntastic but better, check for syntax errors.
+~~- [autoformat](https://github.com/Chiel92/vim-autoformat) : clang-format to quickly clean-up code.~~
+~~- [ALE](https://github.com/dense-analysis/ale) : syntastic but better, check for syntax errors.~~
 - [airline](https://github.com/vim-airline/vim-airline) : for a better UI.
 
 ### zsh + oh-my-zsh
@@ -23,6 +23,9 @@ Should work **without root access**.
 - [alien](https://github.com/eendroroy/alien) theme : my favorite omz theme.
 
 # Installation
+###IMPORTANT###
+use **install-ubuntu** (not maintained) or **install-arch** depending on your distro.
+
 Just clone and run install
 ``` bash
 git clone https://github.com/zeFresk/dotfiles.git

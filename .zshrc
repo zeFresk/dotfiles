@@ -1,4 +1,5 @@
 # Lines configured by zsh-newuser-install
+source ~/.bash_profile
 HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
@@ -14,7 +15,7 @@ compinit
 # End of lines added by compinstall
 
 ### Added by Zplugin's installer
-source '~/.zplugin/bin/zplugin.zsh'
+source '/home/zefresk/.zplugin/bin/zplugin.zsh'
 autoload -Uz _zplugin
 (( ${+_comps} )) && _comps[zplugin]=_zplugin
 ### End of Zplugin installer's chunk
@@ -63,10 +64,12 @@ export COLUMNS  # Remember columns for subprocesses.
 function ls {
   command ls -F -h --color=always -v --author --time-style=long-iso -C "$@" | less -R -X -F
 }
-alias ll='ls -l'
-alias l='ls -l -a'
-alias fcolor='for i in {1..16384}; do echo -en "\e[38;5;${i}mTest";done'
-alias fcol='for j in {1..5}; do fcolor;done'
+alias ll='ls -l -F -h --color=always -v --author --time-style=long-iso'
+alias l='ls  -l -a -F -h --color=always -v --author --time-style=long-iso'
 
 # Needed for colors to work on cmder...
 #fcol
+
+# **** LISAAC COMPILER ****
+export PATH=$PATH:/home/zefresk/Documents/package/lisaac/bin
+
