@@ -22,7 +22,7 @@ fi
 read -p "Do you have root access ? [y/n] " -i y -e ROOT_ACCESS
 
 printf "Checking for zsh..."
-if [ "$(pacman -Qi zsh | grep "install ok installed")" != "" ]; then
+if [ "$(pacman -Qi zsh 2>/dev/null | wc -l)" != "0" ]; then
 	printf " found!\n"
 else
 	printf " not found!\n"
@@ -43,24 +43,24 @@ else
 	printf "zsh installed!\n"
 fi
 
-printf "Checking for zplugin..."
-if [ -d "~/.zplugin" ]; then
+printf "Checking for zinit..."
+if [ -d "$HOME/.zinit" ]; then
 	printf " found!\n"
 else
 	printf " not found!\n"
-	printf "Installing zplugin...\n"
-	sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zplugin/master/doc/install.sh)"
-	printf "zplugin installed!\n"
+	printf "Installing zinit...\n"
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma/zinit/master/doc/install.sh)"
+	printf "zinit installed!\n"
 fi
 
 printf "Checking for neovim..."
-if [ "$(pacman -Qi nvim | grep "install ok installed")" != "" ]; then
+if [ "$(pacman -Qi neovim 2>/dev/null | wc -l)" != "0" ]; then
 	printf " found!\n"
 else
 	printf " not found!\n"
 	printf "Installing neovim...\n"
 	if [ "$ROOT_ACCESS" == "y" ]; then
-		sudo pacman -S neovim python-neovim python-pip
+		sudo pacman -S xclip neovim python-neovim python-pip python2-pip
 		sudo pip install pynvim && sudo pip2 install pynvim
 	else
 		printf "Downloading neovim...\n"
@@ -70,14 +70,14 @@ else
 		mv nvim.appimage ~/.local/bin
 		printf "\n#nvim support\nalias nvim='nvim.appimage'" >> .zshrc
 		printf "Checking for pip... "
-		if [ "$(pacman -Qi pip2 | grep "install ok installed")" != "" ]; then
+		if [ "$(pacman -Qi pip2 2>/dev/null | wc -l)" != "0" ]; then
 			printf "Installing Python2 support...\n"
 			pip2 install --user pynvim
 		else
 			printf "!Warning : No pip detected neovim may not works correctly !\n"
 		fi
 		printf "Checking for pip3... "
-		if [ "$(pacman -Qi pip | grep "install ok installed")" != "" ]; then
+		if [ "$(pacman -Qi pip 2>/dev/null | wc -l)" != "0" ]; then
 			printf "Installing Python3 support...\n"
 			pip install --user pynvim
 		else
@@ -87,46 +87,71 @@ else
 	printf "neovim installed!\n"
 fi
 
-read -p "Neovim works better with ruby extension, install it ? [y/n] " -i y -e RUBY
-if [ "$RUBY" == "y" ]; then 
-	if ! command -v gem >/dev/null 2>&1 ; then
+printf "Searching for ruby..."
+if [ "$(pacman -Qi ruby 2>/dev/null | wc -l)" == "0" ]; then 
+	read -p "\nNeovim works better with ruby extension, install it ? [y/n] " -i y -e RUBY
+	if [ "$RUBY" == "y" ]; then 
 		if [ "$ROOT_ACCESS" == "y" ]; then
 			sudo pacman -S ruby
-			sudo gem install neovim
-		else
-			printf "Error: Cannot install ruby without root privileges !\n"
+			echo PATH="$PATH:$(ruby -e 'puts Gem.user_dir')/bin" >> ~/.profile
 		fi
-	else
+	fi
+else
+	printf " found!\n"
+fi
+
+
+if [ "$(pacman -Qi ruby 2>/dev/null | wc -l)" == "0" ]; then 
+	printf "Searching for ruby neovim extension..."
+	if [ "$(gem list | grep "neovim")" == "" ]; then
+		printf " not found!\n"
+		printf "Installing ruby neovim extension...\n"
 		if [ "$ROOT_ACCESS" == "y" ]; then
 			sudo gem install neovim
 		else
 			gem install --user-install neovim
 		fi
+		printf "Installed !\n"
+	else
+		printf " found!\n"
 	fi
 fi
 
-read -p "Node.js is recommended, install it ? [y/n] " -i y -e NODEJS
-if [ "$NODEJS" == "y" ]; then 
-	if ! command -v npm >/dev/null 2>&1 ; then
+printf "Searching for npm..."
+if [ "$(pacman -Qi npm 2>/dev/null | wc -l)" == "0" ]; then 
+	printf " not found!\n"
+	read -p "\nNode.js is recommended, install it ? [y/n] " -i y -e NODEJS
+	if [ "$NODEJS" == "y" ]; then 
 		if [ "$ROOT_ACCESS" == "y" ]; then
-			sudo pacman -S nodejs
-			sudo npm install -g neovim
+			sudo pacman -S nodejs npm			
 		else
 			printf "Error: Cannot install Node.js without root privileges !\n"
 		fi
-	else
+	fi
+else
+	printf " found!\n"
+fi
+
+if [ "$(pacman -Qi npm 2>/dev/null | wc -l)" == "0" ]; then 
+	printf "Searching for node.js neovim extension..."
+	if [ "$(npm list -g --depth=0 | grep "neovim")" == "" ]; then
+		printf " not found!\n"
+		printf "Installing Node.js neovim extension...\n"
 		if [ "$ROOT_ACCESS" == "y" ]; then
 			sudo npm install -g neovim
 		else
-			printf "Error: Cannot install neovim package without root privileges.\n"
+			sudo npm install neovim
 		fi
+		printf "Installed !\n"
+	else
+		printf " found!\n"
 	fi
 fi
 
 
 
 printf "Checking for vim-plug..."
-if [ -f "~/.local/share/nvim/site/autoload/plug.vim" ]; then
+if [ -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]; then
 	printf " found!\n"
 else
 	printf " not found!\n"
@@ -136,28 +161,56 @@ else
 fi
 
 printf "Installing powerline fonts..."
-if [ "$ROOT_ACCESS" == "y" ]; then
-	sudo pacman -S powerline-fonts
+if [ "$(pacman -Qi powerline-fonts 2>/dev/null | wc -l)" != "0" ]; then
+	printf " found!\n"
 else
-	git clone https://github.com/powerline/fonts.git --depth=1 /tmp/fonts
-	chmod +x /tmp/fonts/install.sh
-	exec /tmp/fonts/install.sh
+	if [ "$ROOT_ACCESS" == "y" ]; then
+		sudo pacman -S powerline-fonts
+	else
+		git clone https://github.com/powerline/fonts.git --depth=1 /tmp/fonts
+		chmod +x /tmp/fonts/install.sh
+		exec /tmp/fonts/install.sh
+	fi
+	printf "\npowerline fonts installed!\n"
 fi
-printf "powerline fonts installed!\n"
 
-printf "Copying neovim and zsh configs..."
-cp .zshrc ~/.zshrc
-ln -s $DIR/nvim ~/.config/nvim
+printf "Copying neovim and zsh configs...\n"
+printf "  .zshrc..."
+if [ -f  "$HOME/.zshrc" ]; then
+	cp "$HOME/.zshrc" "$HOME/.zshrc.bak"
+fi
+ln -f ./.zshrc "$HOME/.zshrc"
 printf " done!\n"
 
-printf "Setting default shell to zsh..."
+printf "  nvim..."
+if [ -d "$HOME/.config/nvim" ]; then
+	CONTENT=$(readlink "$HOME/.config/nvim")
+	if [ "$CONTENT" == "$DIR/nvim" ]; then
+		printf "E "
+	else
+		cp -r "$HOME/.config/nvim" "$HOME/.config/nvim_bak"
+		tar -cvzf "$HOME/.config/nvim_backup.tar.gz" "$HOME/.config/nvim_bak"
+		rm -rf "$HOME/.config/nvim_bak" "$HOME/.config/nvim"
+		ln -s "$DIR/nvim" "$HOME/.config/nvim"
+	fi
+else
+	ln -s "$DIR/nvim" "$HOME/.config/nvim"
+fi
+printf " done!\n"
+
+
+printf "Setting default shell to zsh...\n"
 if [ "$ROOT_ACCESS" == "y" ]; then
 	chsh -s /bin/zsh
 else
 	if [ -f "~/.profile" ]; then
-		echo "exec $HOME/bin/zsh -l" >> ~/.profile
+		if [ "$(cat ~/.profile | grep "/bin/zsh -l")" == "" ]; then
+			echo "exec $HOME/bin/zsh -l" >> ~/.profile
+		fi
 	else
-		echo "exec $HOME/bin/zsh -l" >> ~/.login
+		if [ "$(cat ~/.login | grep "/bin/zsh -l")" == "" ]; then
+			echo "exec $HOME/bin/zsh -l" >> ~/.login
+		fi
 	fi
 fi
 printf " done!\n"
@@ -167,19 +220,17 @@ nvim -c "PlugInstall"
 printf " done!\n"
 
 printf "Installing Coc extensions..."
-nvim -c "CocInstall coc-marketplace coc-json coc-tsserver coc-html coc-css coc-java coc-yaml coc-python coc-highlight coc-xml coc-sql coc-texlab coc-sh coc-phpls coc-java"
+nvim -c "CocInstall coc-marketplace coc-json coc-tsserver coc-html coc-css coc-java coc-yaml coc-python coc-xml coc-sql coc-texlab coc-sh coc-phpls coc-java"
 
 if [ "$ROOT_ACCESS" == "y" ]; then
 	if ! command -v ccls >/dev/null 2>&1 ; then
 		read -p "ccls not found, install it ? [y/n] " -i y -e CCLS
 		if [ "$CCLS" == "y" ]; then 
 			printf "Installing dependancies...\n"
-			sudo pacman -S ccls clang-format
+			sudo pacman -S ccls
 		fi
 	fi
 fi
-
-
 
 
 printf "\n###\nInstallation finished, please launch a new terminal or run zsh.\n"
