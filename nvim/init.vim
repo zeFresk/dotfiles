@@ -23,7 +23,8 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
 " Color schemes
-Plug 'sickill/vim-monokai'
+" Plug 'sickill/vim-monokai'
+Plug 'jschmold/sweet-dark.vim'
 
 " Plugins END
 call plug#end()
@@ -132,7 +133,7 @@ nn <silent><buffer> <C-h> :call CocLocations('ccls','$ccls/navigate',{'direction
 
 """ Theme
 set termguicolors
-colorscheme monokai
+colorscheme sweet_dark
 let g:airline#extensions#tabline#enabled = 1
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#coc#enabled = 1
