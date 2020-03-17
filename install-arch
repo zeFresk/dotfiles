@@ -22,7 +22,7 @@ fi
 read -p "Do you have root access ? [y/n] " -i y -e ROOT_ACCESS
 
 printf "Checking for zsh..."
-if [ "$(dpkg -s zsh | grep "install ok installed")" != "" ]; then
+if [ "$(pacman -Qi zsh | grep "install ok installed")" != "" ]; then
 	printf " found!\n"
 else
 	printf " not found!\n"
@@ -54,7 +54,7 @@ else
 fi
 
 printf "Checking for neovim..."
-if [ "$(dpkg -s nvim | grep "install ok installed")" != "" ]; then
+if [ "$(pacman -Qi nvim | grep "install ok installed")" != "" ]; then
 	printf " found!\n"
 else
 	printf " not found!\n"
@@ -70,14 +70,14 @@ else
 		mv nvim.appimage ~/.local/bin
 		printf "\n#nvim support\nalias nvim='nvim.appimage'" >> .zshrc
 		printf "Checking for pip... "
-		if [ "$(dpkg -s pip2 | grep "install ok installed")" != "" ]; then
+		if [ "$(pacman -Qi pip2 | grep "install ok installed")" != "" ]; then
 			printf "Installing Python2 support...\n"
 			pip2 install --user pynvim
 		else
 			printf "!Warning : No pip detected neovim may not works correctly !\n"
 		fi
 		printf "Checking for pip3... "
-		if [ "$(dpkg -s pip | grep "install ok installed")" != "" ]; then
+		if [ "$(pacman -Qi pip | grep "install ok installed")" != "" ]; then
 			printf "Installing Python3 support...\n"
 			pip install --user pynvim
 		else
