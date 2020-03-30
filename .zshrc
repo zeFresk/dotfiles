@@ -71,6 +71,6 @@ alias l='ls  -l -a -F -h --color=always -v --author --time-style=long-iso'
 #fcol
 
 # **** LISAAC COMPILER ****
-export PATH=$PATH:/home/zefresk/Documents/package/lisaac/bin
-# **** RUBY GEMS ****
+export PATH=$PATH:/home/zefresk/Documents/pkg/lisaac/bin
+
 export PATH="$PATH:$(ruby -e 'puts Gem.user_dir')/bin"
