@@ -5,8 +5,10 @@
 call plug#begin(stdpath('data').'/plugged')
 
 "Plug 'Shougo/neoinclude.vim'
-Plug 'jsfaint/coc-neoinclude'
+"Plug 'jsfaint/coc-neoinclude'
 Plug 'neoclide/coc.nvim', {'branch': 'release', 'do': { -> coc#util#install()}}
+
+Plug 'vim-scripts/DoxygenToolkit.vim'
 
 Plug 'vim-vdebug/vdebug'
 
@@ -130,6 +132,7 @@ nn <silent><buffer> <C-k> :call CocLocations('ccls','$ccls/navigate',{'direction
 nn <silent><buffer> <C-j> :call CocLocations('ccls','$ccls/navigate',{'direction':'R'})<cr>
 nn <silent><buffer> <C-h> :call CocLocations('ccls','$ccls/navigate',{'direction':'U'})<cr>
 
+
 """ Theme
 set termguicolors
 colorscheme monokai
@@ -227,3 +230,10 @@ nmap <leader>p <ESC>:NERDTreeToggle<CR><C-w>w
 
 " Quick switch between modes
 imap <Leader><Leader> <ESC> " Back to normal mode
+nmap <Leader>x :Dox<CR>
+
+" Split naviguation
+nmap <silent> <C-Up> :wincmd k<CR>
+nmap <silent> <C-Down> :wincmd j<CR>
+nmap <silent> <C-Left> :wincmd h<CR>
+nmap <silent> <C-Right> :wincmd l<CR>
