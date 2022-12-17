@@ -29,8 +29,12 @@
 				},
 				"completion": {
 					"placeholder": true
-				}
+				},
+				"clang": { 
+          				"extraArgs": [ "-std=c++20" ] 
+        			}
 			}
 		}
-	}
+	},
+	"ltex.language": "en"
 }

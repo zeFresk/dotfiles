@@ -1,6 +1,9 @@
 " zeFresk's neovim config.
 " Feel free to use.
-"
+
+" multiple Python versions
+let g:python3_host_prog='python'
+
 " Plugins START
 call plug#begin(stdpath('data').'/plugged')
 
@@ -28,6 +31,9 @@ Plug 'vim-airline/vim-airline-themes'
 " Plug 'sickill/vim-monokai'
 Plug 'jschmold/sweet-dark.vim'
 
+" GPT-3
+Plug 'ironjr/gpt.vim'
+
 " Plugins END
 call plug#end()
 
@@ -43,14 +49,26 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~ '\s'
 endfunction
 
-inoremap <silent><expr> <Tab>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<Tab>" :
-      \ coc#refresh()
+function! CheckBackSpace() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+  endfunction
 
-" inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm() : "\<C-g>u\<CR>"
+" Insert <tab> when previous text is space, refresh completion if not.
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1):
+      \ CheckBackSpace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+if has('nvim')
+  inoremap <silent><expr> <c-space> coc#refresh()
+else
+  inoremap <silent><expr> <c-@> coc#refresh()
+endif
+
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#_select_confirm()
+				\: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
 
 " Use K to show documentation in preview window
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -132,6 +150,8 @@ nn <silent><buffer> <C-l> :call CocLocations('ccls','$ccls/navigate',{'direction
 nn <silent><buffer> <C-k> :call CocLocations('ccls','$ccls/navigate',{'direction':'L'})<cr>
 nn <silent><buffer> <C-j> :call CocLocations('ccls','$ccls/navigate',{'direction':'R'})<cr>
 nn <silent><buffer> <C-h> :call CocLocations('ccls','$ccls/navigate',{'direction':'U'})<cr>
+
+let g:coc_filetype_map = {'tex': 'latex'}
 
 
 """ Theme
@@ -238,3 +258,17 @@ nmap <silent> <C-Up> :wincmd k<CR>
 nmap <silent> <C-Down> :wincmd j<CR>
 nmap <silent> <C-Left> :wincmd h<CR>
 nmap <silent> <C-Right> :wincmd l<CR>
+
+" EZ mapping
+autocmd BufEnter *.ez :setlocal filetype=cpp
+
+" GPT-3
+
+"Multiple lines
+nmap  <C-x> :CodeCompletion 512<CR>
+imap  <C-x> <Esc>li<C-g>u<Esc>l:CodeCompletion 512<CR>
+
+" One line
+nmap  <C-w> :CodeCompletionLine<CR>
+imap  <C-w> <Esc>li<C-g>u<Esc>l:CodeCompletionLine<CR>
+
