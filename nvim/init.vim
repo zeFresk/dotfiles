@@ -16,7 +16,7 @@ Plug 'vim-scripts/DoxygenToolkit.vim'
 Plug 'vim-vdebug/vdebug'
 
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' , 'for': 'markdown' }
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+" Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'easymotion/vim-easymotion'
 " Plug 'donRaphaco/neotex', { 'for': 'tex' } " removed for coc plugin
 
@@ -34,8 +34,24 @@ Plug 'jschmold/sweet-dark.vim'
 " GPT-3
 Plug 'ironjr/gpt.vim'
 
+" Better than NERDTree
+Plug 'nvim-tree/nvim-web-devicons' " optional, for file icons
+Plug 'nvim-tree/nvim-tree.lua'
+
+
 " Plugins END
 call plug#end()
+
+" nvim-tree
+
+lua << EOF
+-- disable netrw at the very start of your init.lua (strongly advised)
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- empty setup using defaults
+require("nvim-tree").setup()
+EOF
 
 " Coc
 autocmd FileType json syntax match Comment +\/\/.\+$+
@@ -106,6 +122,15 @@ xmap if <Plug>(coc-funcobj-i)
 xmap af <Plug>(coc-funcobj-a)
 omap if <Plug>(coc-funcobj-i)
 omap af <Plug>(coc-funcobj-a)
+
+if has('nvim-0.4.0') || has('patch-8.2.0750')
+	  nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+	  nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+	  inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+	  inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+	  vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+	  vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+endif
 
 " Use <C-d> for select selections ranges, needs server support, like: coc-tsserver, coc-python
 nmap <silent> <C-d> <Plug>(coc-range-select)
@@ -246,8 +271,8 @@ omap / <Plug>(easymotion-tn)
 nmap <Leader>o o<ESC>k
 nmap <Leader>O O<ESC>j
 
-" NERDTree
-nmap <leader>p <ESC>:NERDTreeToggle<CR><C-w>w
+" nvim-tree
+nmap <leader>p <ESC>:NvimTreeToggle<CR>
 
 " Quick switch between modes
 imap <Leader><Leader> <ESC> " Back to normal mode
@@ -265,10 +290,10 @@ autocmd BufEnter *.ez :setlocal filetype=cpp
 " GPT-3
 
 "Multiple lines
-nmap  <C-x> :CodeCompletion 512<CR>
-imap  <C-x> <Esc>li<C-g>u<Esc>l:CodeCompletion 512<CR>
+nmap  <A-x> :CodeCompletion 512<CR>
+imap  <A-x> <Esc>li<C-g>u<Esc>l:CodeCompletion 512<CR>
 
 " One line
-nmap  <C-w> :CodeCompletionLine<CR>
-imap  <C-w> <Esc>li<C-g>u<Esc>l:CodeCompletionLine<CR>
+nmap  <A-c> :CodeCompletionLine<CR>
+imap  <A-c> <Esc>li<C-g>u<Esc>l:CodeCompletionLine<CR>
 
